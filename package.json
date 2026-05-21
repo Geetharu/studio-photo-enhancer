@@ -9,7 +9,10 @@
     "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "vercel": "vercel",
+    "vercel:deploy": "vercel --prod",
+    "vercel:env-pull": "vercel env pull .env.local"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
@@ -31,6 +34,7 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.3",
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "vercel": "^41.0.0"
   }
 }

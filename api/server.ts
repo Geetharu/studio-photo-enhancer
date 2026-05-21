@@ -3,7 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
@@ -26,11 +25,14 @@ async function createApp() {
     return !!key && key !== "MY_GEMINI_API_KEY" && key !== "";
   }
 
-  // API Check Health — read env at request time (Vercel serverless cold starts)
   app.get("/api/health", (req, res) => {
+    const currentApiKey = process.env.GEMINI_API_KEY;
     res.json({
       status: "ok",
-      hasApiKey: isValidGeminiApiKey(process.env.GEMINI_API_KEY),
+      hasApiKey:
+        !!currentApiKey &&
+        currentApiKey !== "MY_GEMINI_API_KEY" &&
+        currentApiKey !== "",
       timestamp: new Date().toISOString(),
     });
   });
@@ -156,9 +158,10 @@ async function createApp() {
     }
   });
 
-  // Mount Vite dev middleware locally, or static assets for local production (`npm start`)
+  // Vite dev middleware — local only; dynamic import keeps vite out of Vercel production bundle
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
+    const { createServer } = await import("vite");
+    const vite = await createServer({
       root: ROOT_DIR,
       configFile: path.join(ROOT_DIR, "vite.config.ts"),
       server: { middlewareMode: true },
@@ -166,13 +169,6 @@ async function createApp() {
     });
     app.use(vite.middlewares);
     console.log("Vite dev middleware mounted on Express.");
-  } else if (!process.env.VERCEL) {
-    const distPath = path.join(ROOT_DIR, "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-    console.log("Production static server configured.");
   }
 
   return { app, PORT };
