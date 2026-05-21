@@ -165,7 +165,18 @@ export default function App() {
       const data = await response.json();
 
       if (!response.ok || !data.success || !data.imageUrl) {
-        const errorMsg = data.error || `Enhancement failed (${response.status}).`;
+        let errorMsg = data.error || `Enhancement failed (${response.status}).`;
+        
+        // Custom logic to catch raw JSON and rate limits
+        const errorString = typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg);
+        const lowerError = errorString.toLowerCase();
+        
+        if (lowerError.includes('429') || lowerError.includes('quota') || lowerError.includes('rate limit') || lowerError.includes('resource exhausted')) {
+          errorMsg = 'API Rate Limit Reached: Please wait a moment and try again.';
+        } else if (typeof errorMsg !== 'string') {
+          errorMsg = data.error?.message || 'An unexpected API error occurred.';
+        }
+
         setErrorNotice(errorMsg);
         addLog(`Error: ${errorMsg}`);
         return;
@@ -193,7 +204,13 @@ export default function App() {
         }
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Network error during enhancement.';
+      let message = err instanceof Error ? err.message : 'Network error during enhancement.';
+      
+      const lowerError = message.toLowerCase();
+      if (lowerError.includes('429') || lowerError.includes('quota') || lowerError.includes('rate limit') || lowerError.includes('resource exhausted')) {
+        message = 'API Rate Limit Reached: Please wait a moment and try again.';
+      }
+      
       setErrorNotice(message);
       addLog(`Error: ${message}`);
     } finally {
@@ -470,16 +487,11 @@ export default function App() {
             />
           )}
 
-          {/* Feedback details: Error/API state notifications */}
+          {/* Feedback details: Sleek Error/API state notifications */}
           {errorNotice && (
-            <div id="api-status-notice" className="bg-red-950/40 border border-red-500/30 rounded-2xl p-4 flex gap-3 text-left">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-red-400 uppercase tracking-wider font-mono">
-                  Enhancement Failed
-                </h4>
-                <p className="text-[11px] text-zinc-400 leading-normal">{errorNotice}</p>
-              </div>
+            <div id="api-status-notice" className="bg-red-950/60 border border-red-500/30 rounded-xl p-3 flex items-center gap-3 text-left max-w-[600px] shadow-lg">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <p className="text-xs font-mono text-zinc-300 leading-relaxed m-0 break-words">{errorNotice}</p>
             </div>
           )}
         </div>
@@ -513,7 +525,7 @@ export default function App() {
 
       </main>
 
-      <footer id="studio-footer" className="studio-footer">
+      <footer id="studio-footer" className="studio-footer text-center p-5 border-t border-[#1a1a1a] text-[#666] text-xs tracking-wider">
         <p className="studio-footer__text">
           STUDIO PHOTO ENHANCER &copy; 2026 — GEETH WICKRAMASINGHE &bull; POWERED BY
           GEMINI AI &bull; STATUS: ONLINE
