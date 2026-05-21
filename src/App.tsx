@@ -513,16 +513,11 @@ export default function App() {
 
       </main>
 
-      {/* Modern minimal footer */}
-      <footer id="studio-footer" className="mt-auto border-t border-zinc-900 bg-zinc-950 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-zinc-550 text-[10px] font-mono">
-        <div>
-          STUDIO PHOTO ENHANCER &copy; {new Date().getFullYear()} — CREATED WITH GOOGLE GEMINI IMAGE ARCS
-        </div>
-        <div className="flex items-center gap-3">
-          <span>PORT PORTAL: 3000</span>
-          <span className="w-1 h-1 bg-zinc-700 rounded-full"></span>
-          <span>COMPOSITE ACCELERATION: ACTIVE</span>
-        </div>
+      <footer id="studio-footer" className="studio-footer">
+        <p className="studio-footer__text">
+          STUDIO PHOTO ENHANCER &copy; 2026 — GEETH WICKRAMASINGHE &bull; POWERED BY
+          GEMINI AI &bull; STATUS: ONLINE
+        </p>
       </footer>
     </div>
   );

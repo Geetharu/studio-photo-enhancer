@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+.studio-footer {
+  margin-top: auto;
+  border-top: 1px solid #1a1a1a;
+  background-color: #09090b;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.studio-footer__text {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.65rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: #666;
+  text-transform: uppercase;
+}
