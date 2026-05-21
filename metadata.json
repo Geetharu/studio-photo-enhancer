@@ -1,0 +1,6 @@
+{
+  "name": "Studio Photo Enhancer",
+  "description": "Professional studio grade photo editor and enhancer that applies cinematic lighting, glowing rim lights, and filmic color grading using Gemini multimodal editing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
