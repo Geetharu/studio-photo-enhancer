@@ -10,13 +10,13 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 }
 
-async function startServer() {
+async function createApp() {
   const app = express();
   const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
   // Increase payload limit for base64 image transfers
-  app.use(express.json({ limit: '12mb' }));
-  app.use(express.urlencoded({ limit: '12mb', extended: true }));
+  app.use(express.json({ limit: "12mb" }));
+  app.use(express.urlencoded({ limit: "12mb", extended: true }));
 
   // Initialize Gemini client if API key is present
   const apiKey = process.env.GEMINI_API_KEY;
@@ -28,16 +28,18 @@ async function startServer() {
         apiKey: apiKey,
         httpOptions: {
           headers: {
-            'User-Agent': 'aistudio-build',
-          }
-        }
+            "User-Agent": "aistudio-build",
+          },
+        },
       });
       console.log("Gemini Client initialized successfully using API key.");
     } catch (err) {
       console.error("Failed to initialize Gemini Client:", err);
     }
   } else {
-    console.warn("No valid GEMINI_API_KEY found. AI enhancements will run in high-fidelity simulation mode.");
+    console.warn(
+      "No valid GEMINI_API_KEY found. AI enhancements will run in high-fidelity simulation mode."
+    );
   }
 
   // API Check Health
@@ -45,7 +47,7 @@ async function startServer() {
     res.json({
       status: "ok",
       hasApiKey: !!apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey !== "",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
@@ -150,7 +152,7 @@ async function startServer() {
     }
   });
 
-  // Mount Vite development middleware first, or serve production assets
+  // Mount Vite dev middleware locally, or static assets for local production (`npm start`)
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -158,18 +160,24 @@ async function startServer() {
     });
     app.use(vite.middlewares);
     console.log("Vite dev middleware mounted on Express.");
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
+  } else if (!process.env.VERCEL) {
+    const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
     });
     console.log("Production static server configured.");
   }
 
+  return { app, PORT };
+}
+
+const { app, PORT } = await createApp();
+
+if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer();
+export default app;
