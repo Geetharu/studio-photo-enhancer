@@ -111,20 +111,20 @@ export default function ImageDropzone({
 
         <div className="mt-5 space-y-2">
           <h3 className="text-sm font-bold text-zinc-100 font-mono tracking-wide uppercase">
-            Upload Image
+            Upload Image to enhance
           </h3>
-          <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
+          <p className="text-xs text-zinc-450 max-w-sm leading-relaxed">
             Drag & drop your low-light photo or original camera image here, or{' '}
             <span className="text-amber-500 underline font-semibold">browse files</span>.
           </p>
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <span className="text-[10px] font-mono uppercase bg-zinc-950 px-2.5 py-1 rounded-md border border-zinc-850 text-zinc-400">
+          <span className="text-[10px] font-mono uppercase bg-zinc-950 px-2.5 py-1 rounded-md border border-zinc-850 text-zinc-550">
             JPG / PNG / WebP up to 8MB
           </span>
-          <span className="text-[10px] font-mono uppercase bg-zinc-950 px-2.5 py-1 rounded-md border border-zinc-850 text-zinc-400">
-            Only Images Supported
+          <span className="text-[10px] font-mono uppercase bg-zinc-950 px-2.5 py-1 rounded-md border border-zinc-850 text-zinc-550">
+            Only image files supported
           </span>
         </div>
 
