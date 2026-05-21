@@ -18,35 +18,15 @@ async function createApp() {
   app.use(express.json({ limit: "12mb" }));
   app.use(express.urlencoded({ limit: "12mb", extended: true }));
 
-  // Initialize Gemini client if API key is present
-  const apiKey = process.env.GEMINI_API_KEY;
-  let ai: GoogleGenAI | null = null;
-
-  if (apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey !== "") {
-    try {
-      ai = new GoogleGenAI({
-        apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
-      });
-      console.log("Gemini Client initialized successfully using API key.");
-    } catch (err) {
-      console.error("Failed to initialize Gemini Client:", err);
-    }
-  } else {
-    console.warn(
-      "No valid GEMINI_API_KEY found. AI enhancements will run in high-fidelity simulation mode."
-    );
+  function isValidGeminiApiKey(key: string | undefined): boolean {
+    return !!key && key !== "MY_GEMINI_API_KEY" && key !== "";
   }
 
-  // API Check Health
+  // API Check Health — read env at request time (Vercel serverless cold starts)
   app.get("/api/health", (req, res) => {
     res.json({
       status: "ok",
-      hasApiKey: !!apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey !== "",
+      hasApiKey: isValidGeminiApiKey(process.env.GEMINI_API_KEY),
       timestamp: new Date().toISOString(),
     });
   });
@@ -107,10 +87,30 @@ async function createApp() {
       return res.status(400).json({ error: "No image payload supplied." });
     }
 
-    if (!ai) {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!isValidGeminiApiKey(apiKey)) {
       return res.status(503).json({
         success: false,
         error: "Gemini API is not configured. Check Vercel Environment Variables.",
+      });
+    }
+
+    let ai: GoogleGenAI;
+    try {
+      ai = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            "User-Agent": "aistudio-build",
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Failed to initialize Gemini Client:", err);
+      return res.status(503).json({
+        success: false,
+        error: "Failed to initialize Gemini client.",
       });
     }
 
