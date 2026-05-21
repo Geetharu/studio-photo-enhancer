@@ -4,13 +4,15 @@ import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
-// Load .env.local first (Vite convention), then .env as fallback
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+// Only load local .env files in development. Vercel injects variables directly in production.
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+  dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+}
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
   // Increase payload limit for base64 image transfers
   app.use(express.json({ limit: '12mb' }));
@@ -106,7 +108,7 @@ async function startServer() {
     if (!ai) {
       return res.status(503).json({
         success: false,
-        error: "Gemini API is not configured. Set GEMINI_API_KEY in .env.local.",
+        error: "Gemini API is not configured. Check Vercel Environment Variables.",
       });
     }
 
