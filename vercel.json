@@ -2,14 +2,14 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "functions": {
-    "server.ts": {
+    "api/server.ts": {
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server.ts"
+      "destination": "/api/server"
     },
     {
       "source": "/(.*)",

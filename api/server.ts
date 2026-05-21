@@ -1,13 +1,17 @@
 import express from "express";
 import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = path.resolve(__dirname, "..");
+
 // Only load local .env files in development. Vercel injects variables directly in production.
 if (process.env.NODE_ENV !== "production") {
-  dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
-  dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+  dotenv.config({ path: path.join(ROOT_DIR, ".env.local") });
+  dotenv.config({ path: path.join(ROOT_DIR, ".env") });
 }
 
 async function createApp() {
@@ -155,13 +159,15 @@ async function createApp() {
   // Mount Vite dev middleware locally, or static assets for local production (`npm start`)
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
+      root: ROOT_DIR,
+      configFile: path.join(ROOT_DIR, "vite.config.ts"),
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
     console.log("Vite dev middleware mounted on Express.");
   } else if (!process.env.VERCEL) {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.join(ROOT_DIR, "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
